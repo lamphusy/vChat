@@ -1,25 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/home/sylp/KLTN/VChat-dnx/VChatCore/VChatCore/VChatCore.csproj": {}
+    "C:\\Users\\Local DIsk D\\Visual Studio Code\\Application\\vChat\\VChatCore\\VChatCore.csproj": {}
   },
   "projects": {
-    "/home/sylp/KLTN/VChat-dnx/VChatCore/VChatCore/VChatCore.csproj": {
+    "C:\\Users\\Local DIsk D\\Visual Studio Code\\Application\\vChat\\VChatCore\\VChatCore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/sylp/KLTN/VChat-dnx/VChatCore/VChatCore/VChatCore.csproj",
+        "projectUniqueName": "C:\\Users\\Local DIsk D\\Visual Studio Code\\Application\\vChat\\VChatCore\\VChatCore.csproj",
         "projectName": "VChatCore",
-        "projectPath": "/home/sylp/KLTN/VChat-dnx/VChatCore/VChatCore/VChatCore.csproj",
-        "packagesPath": "/home/sylp/.nuget/packages/",
-        "outputPath": "/home/sylp/KLTN/VChat-dnx/VChatCore/VChatCore/obj/",
+        "projectPath": "C:\\Users\\Local DIsk D\\Visual Studio Code\\Application\\vChat\\VChatCore\\VChatCore.csproj",
+        "packagesPath": "C:\\Users\\lamph\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Local DIsk D\\Visual Studio Code\\Application\\vChat\\VChatCore\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/sylp/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\lamph\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -32,6 +39,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -41,6 +53,10 @@
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[6.0.0, )"
+            },
+            "Microsoft.Azure.SignalR": {
+              "target": "Package",
+              "version": "[1.21.2, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -69,7 +85,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -81,7 +98,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/6.0.128/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

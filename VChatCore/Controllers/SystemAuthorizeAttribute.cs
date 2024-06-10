@@ -39,6 +39,8 @@ namespace VChatCore.Controllers
                 }
                 catch (SecurityTokenExpiredException ex)
                 {
+                    Console.WriteLine($"Error: {ex.Message}");
+
                     ResponseAPI responseAPI = new ResponseAPI();
                     context.HttpContext.Response.StatusCode = responseAPI.Status = (int)HttpStatusCode.NotAcceptable;
                     responseAPI.Message = "Hết phiên đăng nhập";
@@ -46,6 +48,8 @@ namespace VChatCore.Controllers
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine($"Error: {ex.Message}");
+
                     ResponseAPI responseAPI = new ResponseAPI();
                     context.HttpContext.Response.StatusCode = responseAPI.Status = (int)HttpStatusCode.Unauthorized;
                     responseAPI.Message = "Lỗi xác thực";

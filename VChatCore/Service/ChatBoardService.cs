@@ -290,7 +290,8 @@ namespace VChatCore.Service
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    Console.WriteLine($"Error: {ex.Message}");
+                    throw ;
                 }
             }
 
@@ -313,7 +314,9 @@ namespace VChatCore.Service
                 // Có thể tối ưu bằng cách chỉ gửi cho user trong nhóm chat
                 this.chatHub.Clients.All.SendAsync("messageHubListener", true);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
 
         /// <summary>

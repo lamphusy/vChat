@@ -72,10 +72,13 @@ namespace VChatCore.Controllers
                 return File(image, "image/*");
             }
             catch (Exception ex)
-            {
+            {                
+                Console.WriteLine($"Error: {ex.Message}");
+
                 return BadRequest();
             }
         }
+
 
         [HttpGet("file")]
         public IActionResult DownloadFile(string key)

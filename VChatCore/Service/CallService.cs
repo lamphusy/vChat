@@ -216,7 +216,10 @@ namespace VChatCore.Service
                     IRestResponse response = client.Execute(request);
                     #endregion
                 }
-                catch (Exception ex) { }
+                catch (Exception ex) {
+                    Console.WriteLine($"Error: {ex.Message}");
+                
+              }
             }
         }
     }
