@@ -67,7 +67,7 @@ namespace VChatCore.Controllers
         {
             try
             {
-                string path = Path.Combine(this._hostEnvironment.ContentRootPath, key);
+                string path = Path.Combine(this._hostEnvironment.ContentRootPath,"wwwroot", key);
                 var image = System.IO.File.OpenRead(path);
                 return File(image, "image/*");
             }
@@ -86,7 +86,7 @@ namespace VChatCore.Controllers
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
-                string pathTemplate = Path.Combine(this._hostEnvironment.ContentRootPath, key);
+                string pathTemplate = Path.Combine(this._hostEnvironment.ContentRootPath,"wwwroot", key);
                 Stream stream = new FileStream(pathTemplate, FileMode.Open);
                 responseAPI.Data = "";
                 return File(stream, "application/octet-stream", key);

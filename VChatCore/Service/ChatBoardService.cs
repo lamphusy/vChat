@@ -207,7 +207,7 @@ namespace VChatCore.Service
                 if (group.Avatar.Contains("data:image/png;base64,"))
                 {
                     string pathAvatar = $"Resource/Avatar/{Guid.NewGuid().ToString("N")}";
-                    string pathFile = Path.Combine(this.hostEnvironment.ContentRootPath, pathAvatar);
+                    string pathFile = Path.Combine(this.hostEnvironment.ContentRootPath,"wwwroot", pathAvatar);
                     DataHelper.Base64ToImage(group.Avatar.Replace("data:image/png;base64,", ""), pathFile);
                     grp.Avatar = group.Avatar = pathAvatar;
                 }
@@ -270,7 +270,7 @@ namespace VChatCore.Service
             // Nếu tin nhắn có file => lưu file
             if (message.Attachments != null && message.Attachments.Count > 0)
             {
-                string path = Path.Combine(this.hostEnvironment.ContentRootPath, $"Resource/Attachment/{DateTime.Now.Year}");
+                string path = Path.Combine(this.hostEnvironment.ContentRootPath, $"wwwroot/Resource/Attachment/{DateTime.Now.Year}");
                 FileHelper.CreateDirectory(path);
                 try
                 {
@@ -285,7 +285,7 @@ namespace VChatCore.Service
                             }
                         }
                         message.Content = message.Attachments[0].FileName;
-                        message.Path = $"Resource/Attachment/{DateTime.Now.Year}/{message.Attachments[0].FileName}";
+                        message.Path = $"wwwroot/Resource/Attachment/{DateTime.Now.Year}/{message.Attachments[0].FileName}";
                     }
                 }
                 catch (Exception ex)
