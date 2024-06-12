@@ -62,8 +62,8 @@ namespace VChatCore.Service
 
                 if (user.Avatar.Contains("data:image/png;base64,"))
                 {
-                    string pathAvatar = $"wwwroot/Resource/Avatar/{Guid.NewGuid().ToString("N")}";
-                    string pathFile = Path.Combine(this.hostEnvironment.ContentRootPath, pathAvatar);
+                    string pathAvatar = $"Resource/Avatar/{Guid.NewGuid().ToString("N")}";
+                    string pathFile = Path.Combine(this.hostEnvironment.ContentRootPath, "wwwroot", pathAvatar);
                     DataHelper.Base64ToImage(user.Avatar.Replace("data:image/png;base64,", ""), pathFile);
                     us.Avatar = user.Avatar = pathAvatar;
                 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -193,6 +194,31 @@ namespace VChatCore.Service
         }
 
         /// <summary>
+        /// Cập nhật danh sách thành viên trong nhóm
+        /// </summary>
+        /// <param name="userCode">User hiện tại đang đăng nhập</param>
+        /// <param name="group">Nhóm</param>
+        public void UpdateUsersGroup(string userCode, GroupDto group)
+        {
+            DateTime dateNow = DateTime.Now;
+
+            var findGroup = this.context.Groups.Where(item => item.Code == group.Code && item.CreatedBy == userCode).Include(item => item.GroupUsers).FirstOrDefault();
+
+            if (group == null)
+                throw new InvalidOperationException("Không tìm thấy nhóm hoặc người dùng không có quyền thực hiện tính năng này");
+
+            var nowMember = group.Users.Select(item => item.Code).ToHashSet();
+
+            foreach (var removeMember in findGroup.GroupUsers.Where(item => !nowMember.Contains(item.UserCode)))
+            {
+                findGroup.GroupUsers.Remove(removeMember);
+                this.context.GroupUsers.Remove(removeMember);
+            }
+
+            this.context.SaveChanges();
+        }
+
+        /// <summary>
         /// Cập nhật ảnh đại diện của nhóm chat
         /// </summary>
         /// <param name="group">Nhóm</param>
@@ -270,7 +296,7 @@ namespace VChatCore.Service
             // Nếu tin nhắn có file => lưu file
             if (message.Attachments != null && message.Attachments.Count > 0)
             {
-                string path = Path.Combine(this.hostEnvironment.ContentRootPath, $"wwwroot/Resource/Attachment/{DateTime.Now.Year}");
+                string path = Path.Combine(this.hostEnvironment.ContentRootPath, "wwwroot", $"Resource/Attachment/{DateTime.Now.Year}");
                 FileHelper.CreateDirectory(path);
                 try
                 {
@@ -285,7 +311,7 @@ namespace VChatCore.Service
                             }
                         }
                         message.Content = message.Attachments[0].FileName;
-                        message.Path = $"wwwroot/Resource/Attachment/{DateTime.Now.Year}/{message.Attachments[0].FileName}";
+                        message.Path = $"Resource/Attachment/{DateTime.Now.Year}/{message.Attachments[0].FileName}";
                     }
                 }
                 catch (Exception ex)

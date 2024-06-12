@@ -78,6 +78,24 @@ namespace VChatCore.Controllers
             }
         }
 
+        [Route("groups/user")]
+        [HttpPut]
+        public IActionResult UpdateUsersGroup(GroupDto group)
+        {
+            ResponseAPI responseAPI = new ResponseAPI();
+            try
+            {
+                string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
+                this._chatBoardService.UpdateUsersGroup(userSession, group);
+                return Ok(responseAPI);
+            }
+            catch (Exception ex)
+            {
+                responseAPI.Message = ex.Message;
+                return BadRequest(responseAPI);
+            }
+        }
+
         [Route("update-group-avatar")]
         [HttpPut]
         public IActionResult UpdateGroupAvatar(GroupDto group)

@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Service;
@@ -67,12 +64,12 @@ namespace VChatCore.Controllers
         {
             try
             {
-                string path = Path.Combine(this._hostEnvironment.ContentRootPath,"wwwroot", key);
+                string path = Path.Combine(this._hostEnvironment.ContentRootPath, "wwwroot", key);
                 var image = System.IO.File.OpenRead(path);
                 return File(image, "image/*");
             }
             catch (Exception ex)
-            {                
+            {
                 Console.WriteLine($"Error: {ex.Message}");
 
                 return BadRequest();
@@ -86,7 +83,7 @@ namespace VChatCore.Controllers
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
-                string pathTemplate = Path.Combine(this._hostEnvironment.ContentRootPath,"wwwroot", key);
+                string pathTemplate = Path.Combine(this._hostEnvironment.ContentRootPath, "wwwroot", key);
                 Stream stream = new FileStream(pathTemplate, FileMode.Open);
                 responseAPI.Data = "";
                 return File(stream, "application/octet-stream", key);
