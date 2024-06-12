@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Util;
@@ -242,7 +239,7 @@ namespace VChatCore.Service
                 if (group.Avatar.Contains("data:image/png;base64,"))
                 {
                     string pathAvatar = $"Resource/Avatar/{Guid.NewGuid().ToString("N")}";
-                    string pathFile = Path.Combine(this.hostEnvironment.ContentRootPath,"wwwroot", pathAvatar);
+                    string pathFile = Path.Combine(this.hostEnvironment.ContentRootPath, "wwwroot", pathAvatar);
                     DataHelper.Base64ToImage(group.Avatar.Replace("data:image/png;base64,", ""), pathFile);
                     grp.Avatar = group.Avatar = pathAvatar;
                 }
@@ -326,7 +323,7 @@ namespace VChatCore.Service
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
-                    throw ;
+                    throw;
                 }
             }
 
@@ -349,7 +346,8 @@ namespace VChatCore.Service
                 // Có thể tối ưu bằng cách chỉ gửi cho user trong nhóm chat
                 this.chatHub.Clients.All.SendAsync("messageHubListener", true);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }

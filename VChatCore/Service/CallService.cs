@@ -4,12 +4,9 @@ using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
-using VChatCore.Util;
 
 namespace VChatCore.Service
 {
@@ -216,10 +213,11 @@ namespace VChatCore.Service
                     IRestResponse response = client.Execute(request);
                     #endregion
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     Console.WriteLine($"Error: {ex.Message}");
-                
-              }
+
+                }
             }
         }
     }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace VChatCore
@@ -10,7 +8,7 @@ namespace VChatCore
     public class ChatHub : Hub
     {
         public static ConcurrentDictionary<string, string> users = new ConcurrentDictionary<string, string>();
-     
+
         public string GetConnectionId()
         {
             return Context.ConnectionId;

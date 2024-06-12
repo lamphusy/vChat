@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Util;
