@@ -215,6 +215,15 @@ namespace VChatCore.Service
                 this.context.GroupUsers.Remove(removeMember);
             }
 
+            foreach (var newMember in nowMember)
+            {
+                if (!findGroup.GroupUsers.Any(item => item.UserCode == newMember))
+                    findGroup.GroupUsers.Add(new GroupUser()
+                    {
+                        UserCode = newMember
+                    });
+            }
+
             this.context.SaveChanges();
         }
 
