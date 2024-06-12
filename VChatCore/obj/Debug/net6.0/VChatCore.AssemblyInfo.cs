@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VChatCore")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a9fddea225e54762e97cd76f2b655a08c05730fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db45306a9cf754da734c1b6509b8953e0e53220b")]
 [assembly: System.Reflection.AssemblyProductAttribute("VChatCore")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VChatCore")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
