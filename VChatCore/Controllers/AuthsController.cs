@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Service;
@@ -98,13 +99,13 @@ namespace VChatCore.Controllers
 
         [Route("post-hubconnection")]
         [HttpPost]
-        public IActionResult PutHubConnection(string key)
+        public async Task<IActionResult> PutHubConnection(string key)
         {
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
                 string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
-                this._authService.PutHubConnection(userSession, key);
+                await this._authService.PutHubConnection(userSession, key);
                 return Ok(responseAPI);
             }
             catch (Exception ex)

@@ -37,6 +37,24 @@ namespace VChatCore.Controllers
             }
         }
 
+        [Route("call/group/{groupCode}")]
+        [HttpGet]
+        public IActionResult CallGroup(string groupCode)
+        {
+            ResponseAPI responseAPI = new ResponseAPI();
+            try
+            {
+                string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
+                responseAPI.Data = this._callService.CallGroup(userSession, groupCode);
+                return Ok(responseAPI);
+            }
+            catch (Exception ex)
+            {
+                responseAPI.Message = ex.Message;
+                return BadRequest(responseAPI);
+            }
+        }
+
         [Route("get-history")]
         [HttpGet]
         public IActionResult GetHistory()

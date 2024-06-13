@@ -1,9 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Util;
@@ -13,10 +16,12 @@ namespace VChatCore.Service
     public class AuthService
     {
         protected readonly MyContext context;
+        protected readonly IHubContext<ChatHub> chatHub;
 
-        public AuthService(MyContext context)
+        public AuthService(MyContext context, IHubContext<ChatHub> chatHub)
         {
             this.context = context;
+            this.chatHub = chatHub;
         }
 
         /// <summary>
@@ -94,15 +99,21 @@ namespace VChatCore.Service
         /// </summary>
         /// <param name="userSession">User hiện tại đang đăng nhập</param>
         /// <param name="key">HubConnection</param>
-        public void PutHubConnection(string userSession, string key)
+        public async Task PutHubConnection(string userSession, string key)
         {
-            User user = this.context.Users
+            User user = this.context.Users.Include(item => item.GroupUsers)
                 .FirstOrDefault(x => x.Code.Equals(userSession));
 
             if (user != null)
             {
+                //Cập nhật connectionId trong trong các nhóm mà người dùng tham gia
+                foreach (var gc in user.GroupUsers.Select(item => item.GroupCode).Distinct())
+                {
+                    await this.chatHub.Groups.AddToGroupAsync(key, gc);
+                }
+
                 user.CurrentSession = key;
-                this.context.SaveChanges();
+                await this.context.SaveChangesAsync();
             }
         }
     }

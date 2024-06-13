@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 
@@ -102,14 +104,7 @@ namespace VChatCore.Service
         /// <returns>Đường link truy câp cuộc gọi</returns>
         public string Call(string userSession, string callTo)
         {
-            #region Gọi API tạo room - daily.co
-            var client = new RestClient("https://api.daily.co/v1/rooms");
-            client.Timeout = -1;
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("Authorization", $"Bearer {EnviConfig.DailyToken}");
-            IRestResponse response = client.Execute(request);
-            DailyRoomResp dailyRoomResp = JsonConvert.DeserializeObject<DailyRoomResp>(response.Content);
-            #endregion
+            string urlVideoCall = GetUrlVideoCall();
 
             // Lấy thông tin lịch sử cuộc gọi đã gọi cho user
             string grpCallCode = this.context.GroupCalls
@@ -123,6 +118,7 @@ namespace VChatCore.Service
             DateTime dateNow = DateTime.Now;
 
             User userCallTo = this.context.Users.FirstOrDefault(x => x.Code.Equals(callTo));
+            User userCall = this.context.Users.FirstOrDefault(x => x.Code.Equals(userSession));
 
             // Kiểm tra lịch sử cuộc gọi đã tồn tại hay chưa. Nếu chưa => tạo nhóm gọi mới.
             if (groupCall == null)
@@ -149,7 +145,7 @@ namespace VChatCore.Service
                     UserCode = userSession,
                     Status =Constants.CallStatus.OUT_GOING,
                     Created = dateNow,
-                    Url =dailyRoomResp.url,
+                    Url =urlVideoCall,
                 },
                 new Call()
                 {
@@ -157,7 +153,7 @@ namespace VChatCore.Service
                     UserCode = userCallTo.Code,
                     Status =Constants.CallStatus.MISSED,
                     Created = dateNow,
-                    Url =dailyRoomResp.url,
+                    Url =urlVideoCall,
                 }
             };
 
@@ -166,9 +162,90 @@ namespace VChatCore.Service
 
             ///Truyền thông tin realtime cuộc gọi. Thông tin hubConnection của user.
             if (!string.IsNullOrWhiteSpace(userCallTo.CurrentSession))
-                this.chatHub.Clients.Client(userCallTo.CurrentSession).SendAsync("callHubListener", dailyRoomResp.url);
+                this.chatHub.Clients.Client(userCallTo.CurrentSession).SendAsync("callHubListener", new
+                {
+                    Url = urlVideoCall,
+                    IncomingCallFrom = new
+                    {
+                        UserName = userCall.UserName
+                    }
+                });
 
-            return dailyRoomResp.url;
+            return urlVideoCall;
+        }
+
+        /// <summary>
+        /// Thực hiện cuộc gọi trong nhóm
+        /// </summary>
+        /// <param name="userSession">Code của người dùng thực hiện khởi tạo cuộc gọi trong nhóm</param>
+        /// <param name="groupCode">Code của nhóm</param>
+        /// <param name="usersCode">Mời các thành viên tham gia cuộc gọi. Nếu rỗng thì mời tất cả</param>
+        /// <returns></returns>
+        public async Task<string> CallGroup(string userSession, string groupCode)
+        {
+            string urlVideoCall = GetUrlVideoCall();
+
+            var group = await this.context.Groups.Include(item => item.GroupUsers)
+                .ThenInclude(item => item.User)
+                .FirstOrDefaultAsync(item => item.Code == groupCode);
+            if (group == null)
+                throw new ArgumentException("Nhóm không tồn tại");
+
+            // Lấy thông tin lịch sử cuộc gọi đã gọi trong nhóm
+
+            GroupCall groupCall = this.context.GroupCalls.FirstOrDefault(x => x.Type.Equals(Constants.GroupType.MULTI) && x.Code == group.Code);
+            DateTime dateNow = DateTime.Now;
+
+            User userCall = this.context.Users.FirstOrDefault(x => x.Code.Equals(userSession));
+
+            // Kiểm tra lịch sử cuộc gọi đã tồn tại hay chưa. Nếu chưa => tạo nhóm gọi mới.
+            if (groupCall == null)
+            {
+                groupCall = new GroupCall()
+                {
+                    Code = group.Code,
+                    Created = dateNow,
+                    CreatedBy = userSession,
+                    Type = Constants.GroupType.MULTI,
+                    LastActive = dateNow
+                };
+                this.context.GroupCalls.Add(groupCall);
+            }
+
+            /// Thêm danh sách thành viên trong cuộc gọi. Mặc định người gọi trạng thái OUT_GOING
+            /// Người được gọi trạng thái MISSED. Nếu người được gọi join vào => CHuyển trạng thái IN_COMING
+            List<Call> calls = group.GroupUsers.Select(item => new Call
+            {
+                GroupCallCode = groupCall.Code,
+                UserCode = item.UserCode,
+                Status = Constants.CallStatus.MISSED,
+                Created = dateNow,
+                Url = urlVideoCall
+            }).ToList();
+
+            calls.Add(new Call()
+            {
+                GroupCallCode = groupCall.Code,
+                UserCode = userSession,
+                Status = Constants.CallStatus.OUT_GOING,
+                Created = dateNow,
+                Url = urlVideoCall,
+            });
+
+            this.context.Calls.AddRange(calls);
+            this.context.SaveChanges();
+
+            await this.chatHub.Clients.Group(group.Code).SendAsync("callHubListener", new
+            {
+                Url = urlVideoCall,
+                IncomingCallFrom = new
+                {
+                    GroupName = group.Name,
+                    UserName = userCall.UserName
+                }
+            });
+
+            return urlVideoCall;
         }
 
         /// <summary>
@@ -219,6 +296,20 @@ namespace VChatCore.Service
 
                 }
             }
+        }
+
+        private string GetUrlVideoCall()
+        {
+            #region Gọi API tạo room - daily.co
+            var client = new RestClient("https://api.daily.co/v1/rooms");
+            client.Timeout = -1;
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Authorization", $"Bearer {EnviConfig.DailyToken}");
+            IRestResponse response = client.Execute(request);
+            DailyRoomResp dailyRoomResp = JsonConvert.DeserializeObject<DailyRoomResp>(response.Content);
+            #endregion
+
+            return dailyRoomResp.url;
         }
     }
 

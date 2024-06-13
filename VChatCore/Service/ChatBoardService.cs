@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Util;
@@ -160,7 +161,7 @@ namespace VChatCore.Service
         /// </summary>
         /// <param name="userCode">User hiện tại đang đăng nhập</param>
         /// <param name="group">Nhóm</param>
-        public void AddGroup(string userCode, GroupDto group)
+        public async Task AddGroup(string userCode, GroupDto group)
         {
             DateTime dateNow = DateTime.Now;
             Group grp = new Group()
@@ -188,6 +189,17 @@ namespace VChatCore.Service
 
             this.context.Groups.Add(grp);
             this.context.SaveChanges();
+
+            //Thêm connectionId vô nhóm mới tạo
+            var newGroup = await this.context.Groups.Include(item => item.GroupUsers).ThenInclude(item => item.User).FirstOrDefaultAsync(item => item.Code == grp.Code);
+            if (newGroup != null)
+            {
+                foreach (var gu in newGroup.GroupUsers)
+                {
+                    if (!string.IsNullOrEmpty(gu.User.CurrentSession))
+                        await this.chatHub.Groups.AddToGroupAsync(gu.User.CurrentSession, newGroup.Code);
+                }
+            }
         }
 
         /// <summary>
@@ -195,13 +207,13 @@ namespace VChatCore.Service
         /// </summary>
         /// <param name="userCode">User hiện tại đang đăng nhập</param>
         /// <param name="group">Nhóm</param>
-        public void UpdateUsersGroup(string userCode, GroupDto group)
+        public async Task UpdateUsersGroup(string userCode, GroupDto group)
         {
             DateTime dateNow = DateTime.Now;
 
-            var findGroup = this.context.Groups.Where(item => item.Code == group.Code && item.CreatedBy == userCode).Include(item => item.GroupUsers).FirstOrDefault();
+            var findGroup = this.context.Groups.Where(item => item.Code == group.Code && item.CreatedBy == userCode).Include(item => item.GroupUsers).ThenInclude(item => item.User).FirstOrDefault();
 
-            if (group == null)
+            if (findGroup == null)
                 throw new InvalidOperationException("Không tìm thấy nhóm hoặc người dùng không có quyền thực hiện tính năng này");
 
             var nowMember = group.Users.Select(item => item.Code).ToHashSet();
@@ -210,6 +222,10 @@ namespace VChatCore.Service
             {
                 findGroup.GroupUsers.Remove(removeMember);
                 this.context.GroupUsers.Remove(removeMember);
+
+                //Xóa connectionId ra khỏi nhóm
+                if(!string.IsNullOrEmpty(removeMember.User.CurrentSession))
+                    await this.chatHub.Groups.RemoveFromGroupAsync(removeMember.User.CurrentSession, findGroup.Code);
             }
 
             foreach (var newMember in nowMember)
@@ -219,6 +235,11 @@ namespace VChatCore.Service
                     {
                         UserCode = newMember
                     });
+
+                //Thêm connectionId vô nhóm
+                var dbUser = await this.context.Users.FindAsync(newMember);
+                if (dbUser != null && !string.IsNullOrEmpty(dbUser.CurrentSession))
+                    await this.chatHub.Groups.AddToGroupAsync(dbUser.CurrentSession, findGroup.Code);
             }
 
             this.context.SaveChanges();
