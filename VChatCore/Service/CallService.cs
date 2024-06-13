@@ -167,7 +167,8 @@ namespace VChatCore.Service
                     Url = urlVideoCall,
                     IncomingCallFrom = new
                     {
-                        UserName = userCall.UserName
+                        UserName = userCall.UserName,
+                        Type = Constants.GroupType.SINGLE
                     }
                 });
 
@@ -241,7 +242,8 @@ namespace VChatCore.Service
                 IncomingCallFrom = new
                 {
                     GroupName = group.Name,
-                    UserName = userCall.UserName
+                    UserName = userCall.UserName,
+                    Type = Constants.GroupType.MULTI
                 }
             });
 
