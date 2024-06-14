@@ -143,6 +143,7 @@ namespace VChatCore.Service
                         Avatar = group.Avatar,
                         Name = group.Name,
                         Type = group.Type,
+                        CreatedBy = group.CreatedBy,
                         Users = group.GroupUsers
                             .OrderBy(x => x.User.FullName)
                             .Select(x => new UserDto()
