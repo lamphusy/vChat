@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Service;
 
@@ -39,13 +40,13 @@ namespace VChatCore.Controllers
 
         [Route("call/group/{groupCode}")]
         [HttpGet]
-        public IActionResult CallGroup(string groupCode)
+        public async Task<IActionResult> CallGroup(string groupCode)
         {
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
                 string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
-                responseAPI.Data = this._callService.CallGroup(userSession, groupCode);
+                responseAPI.Data = await this._callService.CallGroup(userSession, groupCode);
                 return Ok(responseAPI);
             }
             catch (Exception ex)
