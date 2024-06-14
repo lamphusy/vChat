@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Service;
 
@@ -59,13 +60,13 @@ namespace VChatCore.Controllers
 
         [Route("groups")]
         [HttpPost]
-        public IActionResult AddGroup(GroupDto group)
+        public async Task<IActionResult> AddGroup(GroupDto group)
         {
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
                 string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
-                this._chatBoardService.AddGroup(userSession, group);
+                await this._chatBoardService.AddGroup(userSession, group);
                 return Ok(responseAPI);
             }
             catch (Exception ex)
@@ -77,13 +78,13 @@ namespace VChatCore.Controllers
 
         [Route("groups/user")]
         [HttpPut]
-        public IActionResult UpdateUsersGroup(GroupDto group)
+        public async Task<IActionResult> UpdateUsersGroup(GroupDto group)
         {
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
                 string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
-                this._chatBoardService.UpdateUsersGroup(userSession, group);
+                await this._chatBoardService.UpdateUsersGroup(userSession, group);
                 return Ok(responseAPI);
             }
             catch (Exception ex)
