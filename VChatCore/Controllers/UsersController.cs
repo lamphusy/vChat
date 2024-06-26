@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Service;
 
@@ -100,6 +101,24 @@ namespace VChatCore.Controllers
             {
                 string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
                 this._usersService.AddContact(userSession, user);
+                return Ok(responseAPI);
+            }
+            catch (Exception ex)
+            {
+                responseAPI.Message = ex.Message;
+                return BadRequest(responseAPI);
+            }
+        }
+
+        [Route("contacts")]
+        [HttpPut]
+        public async Task<IActionResult> DeleteContact(UserDto user)
+        {
+            ResponseAPI responseAPI = new ResponseAPI();
+            try
+            {
+                string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
+                await this._usersService.DeleteContact(userSession, user);
                 return Ok(responseAPI);
             }
             catch (Exception ex)

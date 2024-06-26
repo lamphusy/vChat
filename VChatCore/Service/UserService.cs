@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using VChatCore.Dto;
 using VChatCore.Model;
 using VChatCore.Util;
@@ -155,6 +157,26 @@ namespace VChatCore.Service
             context.Contacts.Add(contact);
 
             context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Thêm mới liên hệ
+        /// </summary>
+        /// <param name="userCode">User hiện tại đang đăng nhập</param>
+        /// <param name="user">Thông tin liên hệ</param>
+        public async Task DeleteContact(string userCode, UserDto user)
+        {
+            var found = await context.Contacts.Where(item => (item.UserCode == userCode && item.ContactCode == user.Code)
+                || (item.UserCode == user.Code && item.ContactCode == userCode))
+                .FirstOrDefaultAsync();
+
+            if (found != null)
+            {
+                context.Contacts.Remove(found);
+                await context.SaveChangesAsync();
+            }
+            else
+                throw new NullReferenceException("Not found contact");
         }
     }
 }
