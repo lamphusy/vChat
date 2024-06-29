@@ -182,7 +182,7 @@ namespace VChatCore.Service
         /// <param name="groupCode">Code của nhóm</param>
         /// <param name="usersCode">Mời các thành viên tham gia cuộc gọi. Nếu rỗng thì mời tất cả</param>
         /// <returns></returns>
-        public async Task<string> CallGroup(string userSession, string groupCode)
+        public async Task<string> CallGroup(string userSession, string connectionId, string groupCode)
         {
             string urlVideoCall = GetUrlVideoCall();
 
@@ -236,7 +236,7 @@ namespace VChatCore.Service
             this.context.Calls.AddRange(calls);
             this.context.SaveChanges();
 
-            await this.chatHub.Clients.Group(group.Code).SendAsync("callHubListener", new
+            await this.chatHub.Clients.GroupExcept(group.Code, connectionId).SendAsync("callHubListener", new
             {
                 Url = urlVideoCall,
                 IncomingCallFrom = new

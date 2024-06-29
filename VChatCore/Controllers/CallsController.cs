@@ -38,15 +38,15 @@ namespace VChatCore.Controllers
             }
         }
 
-        [Route("call/group/{groupCode}")]
+        [Route("call/group/{groupCode}?connectionId={connectionId}")]
         [HttpGet]
-        public async Task<IActionResult> CallGroup(string groupCode)
+        public async Task<IActionResult> CallGroup(string groupCode, string connectionId)
         {
             ResponseAPI responseAPI = new ResponseAPI();
             try
             {
                 string userSession = SystemAuthorization.GetCurrentUser(this._contextAccessor);
-                responseAPI.Data = await this._callService.CallGroup(userSession, groupCode);
+                responseAPI.Data = await this._callService.CallGroup(userSession, connectionId, groupCode);
                 return Ok(responseAPI);
             }
             catch (Exception ex)
