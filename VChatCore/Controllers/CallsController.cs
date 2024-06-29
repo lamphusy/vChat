@@ -38,7 +38,7 @@ namespace VChatCore.Controllers
             }
         }
 
-        [Route("call/group/{groupCode}?connectionId={connectionId}")]
+        [Route("call/group/{groupCode}")]
         [HttpGet]
         public async Task<IActionResult> CallGroup(string groupCode, string connectionId)
         {
