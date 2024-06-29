@@ -173,6 +173,17 @@ namespace VChatCore.Service
             if (found != null)
             {
                 context.Contacts.Remove(found);
+                var foundGroup = await context.Groups.Where(item => item.Type == Constants.GroupType.SINGLE 
+                    && item.GroupUsers.Any(u => u.UserCode.Equals(userCode)) 
+                    && item.GroupUsers.Any(u => u.UserCode.Equals(user.Code))).FirstOrDefaultAsync();
+                if (foundGroup != null)
+                {
+                    context.GroupCalls.RemoveRange(context.GroupCalls.Where(item => item.Code == foundGroup.Code));
+                    context.GroupUsers.RemoveRange(context.GroupUsers.Where(item => item.GroupCode == foundGroup.Code));
+                    context.Messages.RemoveRange(context.Messages.Where(item => item.GroupCode == foundGroup.Code));
+                    context.Groups.Remove(foundGroup);
+                }
+
                 await context.SaveChangesAsync();
             }
             else
